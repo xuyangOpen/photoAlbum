@@ -14,25 +14,15 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>TZImagePickerController.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>032E28982F6887A3044777930A7714BF</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>A9A83F63385AA43314397B8DD375464B</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>AD5C715DD879E4022D289C0052A89478</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>E6554C714703C7FDBE09A87F1766D45F</key>
 		<dict>
 			<key>primary</key>
 			<true/>
