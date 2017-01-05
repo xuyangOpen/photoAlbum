@@ -26,7 +26,6 @@
     self.assets = nil;
     manager.maxCount = 10;
     manager.albumDelegate = self;
-    manager.enableCaching = true;
     manager.isOriginal = false;
     [self presentViewController:manager animated:true completion:nil];
 }

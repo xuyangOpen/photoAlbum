@@ -89,7 +89,6 @@
     tool.isAllowSelectOriginal = true;
     tool.maxCount = 0;
     tool.isOriginal = false;
-    tool.enableCaching = false;
     
     [self pushViewController:[[PhotoAlbumController alloc] init] animated:false];
 }
@@ -124,11 +123,6 @@
 - (void)setMaxCount:(NSInteger)maxCount{
     _maxCount = maxCount;
     [PhotoKitTool shareInstance].maxCount = maxCount;
-}
-
-- (void)setEnableCaching:(BOOL)enableCaching{
-    _enableCaching = enableCaching;
-    [PhotoKitTool shareInstance].enableCaching = enableCaching;
 }
 
 - (void)didReceiveMemoryWarning {

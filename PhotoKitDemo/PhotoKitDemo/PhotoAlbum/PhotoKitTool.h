@@ -24,8 +24,6 @@
 @property (nonatomic, assign) BOOL isOriginal;
 ///最多允许选择的图片张数
 @property (nonatomic, assign) NSInteger maxCount;
-///是否允许缓存图片
-@property (nonatomic, assign) BOOL enableCaching;
 
 ///操作选中照片资源
 @property (nonatomic, strong) NSMutableArray *selectedAssets;

@@ -28,8 +28,6 @@
 @property (nonatomic, assign) BOOL isOriginal;
 ///最多允许选择的图片张数
 @property (nonatomic, assign) NSInteger maxCount;
-///是否允许缓存图片
-@property (nonatomic, assign) BOOL enableCaching;
 
 ///代理
 @property (nonatomic, weak) id<AlbumDelegate> albumDelegate;
