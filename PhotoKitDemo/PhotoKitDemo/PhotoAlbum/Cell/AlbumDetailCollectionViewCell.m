@@ -18,18 +18,30 @@
 
 @implementation AlbumDetailCollectionViewCell
 
+- (void)prepareForReuse{
+    [super prepareForReuse];
+    self.photoImageView.displaySuspended = true;
+}
+
 - (instancetype)initWithFrame:(CGRect)frame{
     if (self = [super initWithFrame:frame]) {
         //照片
-        self.photoImageView = [UIImageView makeImageView:^(UIImageView *make) {
-            make.ivLayerMasksToBounds(true).ivContentMode(UIViewContentModeScaleAspectFill).ivAddToView(self.contentView);
-        }];
+//        self.photoImageView = [UIImageView makeImageView:^(UIImageView *make) {
+//            make.ivLayerMasksToBounds(true).ivContentMode(UIViewContentModeScaleAspectFill).ivAddToView(self.contentView);
+//        }];
+        self.photoImageView = [[ASImageNode alloc] init];
+        self.photoImageView.frame = CGRectMake(0, 0, ITEMSIZE, ITEMSIZE);
+        self.photoImageView.contentMode = UIViewContentModeScaleAspectFill;
+        self.photoImageView.backgroundColor = [UIColor whiteColor];
+        self.photoImageView.layer.masksToBounds = true;
         
-        [self.photoImageView mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.top.equalTo(self.contentView);
-            make.left.equalTo(self.contentView);
-            make.size.equalTo(self.contentView);
-        }];
+        [self.contentView addSubnode:self.photoImageView];
+        
+//        [self.photoImageView mas_makeConstraints:^(MASConstraintMaker *make) {
+//            make.top.equalTo(self.contentView);
+//            make.left.equalTo(self.contentView);
+//            make.size.equalTo(self.contentView);
+//        }];
         //是否选中的小圆点
         self.circle = [UIButton makeButton:^(UIButton *make) {
             make.btnAddTarget(self,@selector(clickSelectButton),UIControlEventTouchUpInside).btnImage([UIImage imageNamed:@"photo_def_photoPickerVc@2x"]).btnAddToView(self.contentView);
@@ -75,6 +87,7 @@
 //        }
         //如果当前请求id==当前资源id，则图片设置为当前请求的图片
         if ([self.representedAssetIdentifier isEqualToString:[[PhotoKitTool shareInstance] getAssetIdentifier:model.asset]]) {
+            self.photoImageView.displaySuspended = false;
             self.photoImageView.image = image;
         } else {
             //否则取消当前请求id

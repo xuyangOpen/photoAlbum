@@ -21,8 +21,6 @@
     BOOL isScrollToBottom;
     //预加载的rect
     CGRect previousPreheatRect;
-    //是否需要转场动画
-    BOOL isNeedMagic;
 }
 
 @property (nonatomic, strong) PHAssetCollection *album;
@@ -34,6 +32,8 @@
 @property (nonatomic, strong) UIButton *numberButton;
 ///预览按钮
 @property (nonatomic, strong) UIButton *previewButton;
+//是否需要转场动画
+@property (nonatomic, assign) BOOL isNeedMagic;
 
 @end
 
@@ -95,7 +95,7 @@ static NSString *albumDetailIdentifier = @"albumDetailIdentifier";
 
 #pragma mark - 转场动画
 - (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController animationControllerForOperation:(UINavigationControllerOperation)operation fromViewController:(UIViewController *)fromVC toViewController:(UIViewController *)toVC{
-    if ([toVC isKindOfClass:[PhotoPreviewController class]] && isNeedMagic) {
+    if ([toVC isKindOfClass:[PhotoPreviewController class]] && self.isNeedMagic) {
         MagicMoveTransiton *transition = [[MagicMoveTransiton alloc] initWithType:@"push" index:0 refresh:false];
         return transition;
     }
@@ -171,7 +171,7 @@ static NSString *albumDetailIdentifier = @"albumDetailIdentifier";
                 }
             };
             //不需要转场动画
-            isNeedMagic = false;
+            strongSelf.isNeedMagic = false;
             [strongSelf.navigationController pushViewController:preview animated:true];
         }
     };
@@ -261,7 +261,7 @@ static NSString *albumDetailIdentifier = @"albumDetailIdentifier";
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     PhotoPreviewController *preview = [[PhotoPreviewController alloc] initWithAssets:self.albumModel.assetsArray atIndex:(int)indexPath.item + 1 magic:true];
     //需要转场动画
-    isNeedMagic = true;
+    self.isNeedMagic = true;
     [self.navigationController pushViewController:preview animated:true];
 }
 
@@ -397,5 +397,9 @@ static NSString *albumDetailIdentifier = @"albumDetailIdentifier";
     return assets;
 }
 
+
+- (void)dealloc {
+    NSLog(@"...");
+}
 
 @end

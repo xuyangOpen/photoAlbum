@@ -41,8 +41,23 @@
 		292AC3451E1B360E002F049C /* MagicMoveTransiton.m in Sources */ = {isa = PBXBuildFile; fileRef = 292AC3441E1B360E002F049C /* MagicMoveTransiton.m */; };
 		292AC34D1E1CC650002F049C /* photo_sel_photoPickerVc@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 292AC34C1E1CC650002F049C /* photo_sel_photoPickerVc@2x.png */; };
 		292AC3571E1CC9A3002F049C /* photo_def_photoPickerVc@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 292AC3561E1CC9A3002F049C /* photo_def_photoPickerVc@2x.png */; };
+		29852BC11E23906E009A3170 /* AsyncDisplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29852BC01E23906E009A3170 /* AsyncDisplayKit.framework */; };
+		29852BC31E23907F009A3170 /* AsyncDisplayKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 29852BC01E23906E009A3170 /* AsyncDisplayKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		530DFB2DEBFD845AAFC8D749 /* Pods_PhotoKitDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C497146A02D4F07810B3A19C /* Pods_PhotoKitDemo.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		29852BC21E23907A009A3170 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				29852BC31E23907F009A3170 /* AsyncDisplayKit.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		2917EC381E0D24AF00B7B2A0 /* AlbumNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlbumNavigationController.h; sourceTree = "<group>"; };
@@ -111,6 +126,7 @@
 		292AC3441E1B360E002F049C /* MagicMoveTransiton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MagicMoveTransiton.m; sourceTree = "<group>"; };
 		292AC34C1E1CC650002F049C /* photo_sel_photoPickerVc@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "photo_sel_photoPickerVc@2x.png"; sourceTree = "<group>"; };
 		292AC3561E1CC9A3002F049C /* photo_def_photoPickerVc@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "photo_def_photoPickerVc@2x.png"; sourceTree = "<group>"; };
+		29852BC01E23906E009A3170 /* AsyncDisplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AsyncDisplayKit.framework; sourceTree = "<group>"; };
 		2FA5F00391654F7B77AB5FB4 /* Pods-PhotoKitDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhotoKitDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-PhotoKitDemo/Pods-PhotoKitDemo.release.xcconfig"; sourceTree = "<group>"; };
 		8C03DDED20259FCB76B51A4D /* Pods-PhotoKitDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhotoKitDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PhotoKitDemo/Pods-PhotoKitDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		C497146A02D4F07810B3A19C /* Pods_PhotoKitDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhotoKitDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -122,6 +138,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				530DFB2DEBFD845AAFC8D749 /* Pods_PhotoKitDemo.framework in Frameworks */,
+				29852BC11E23906E009A3170 /* AsyncDisplayKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -149,6 +166,7 @@
 		2927DCE11E0A6ED500A600F9 /* PhotoKitDemo */ = {
 			isa = PBXGroup;
 			children = (
+				29852BC01E23906E009A3170 /* AsyncDisplayKit.framework */,
 				2927DCF91E0A6FD100A600F9 /* PhotoAlbum */,
 				2927DCE51E0A6ED500A600F9 /* AppDelegate.h */,
 				2927DCE61E0A6ED600A600F9 /* AppDelegate.m */,
@@ -304,6 +322,7 @@
 				2927DCDD1E0A6ED500A600F9 /* Resources */,
 				B6CFFEF16CE470DF189D22AF /* [CP] Embed Pods Frameworks */,
 				D86EBCF6A48245F86C925CE1 /* [CP] Copy Pods Resources */,
+				29852BC21E23907A009A3170 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -566,6 +585,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 4E7S49PEAW;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/PhotoKitDemo",
+				);
 				INFOPLIST_FILE = PhotoKitDemo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -580,6 +603,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 4E7S49PEAW;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/PhotoKitDemo",
+				);
 				INFOPLIST_FILE = PhotoKitDemo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
