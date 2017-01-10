@@ -131,7 +131,7 @@ static NSString *photoPreviewIdentifier = @"photoPreviewCell";
     PhotoKitTool *tool = [PhotoKitTool shareInstance];
     //完成按钮
     self.finishButton = [UIButton makeButton:^(UIButton *make) {
-        make.btnFrame(CGRectMake(SCREEN_WIDTH-52, 2, 50, 40)).btnAddTarget([self getManager],@selector(finishTheSelection),UIControlEventTouchUpInside).btnTitleColor(ThemeColor).btnTitleLableFont([UIFont systemFontOfSize:17]).btnTitle(@"完成").btnAddToView(self.bottomToolView);
+        make.btnFrame(CGRectMake(SCREEN_WIDTH-52, 2, 50, 40)).btnAddTarget(self ,@selector(finishChoose),UIControlEventTouchUpInside).btnTitleColor(ThemeColor).btnTitleLableFont([UIFont systemFontOfSize:17]).btnTitle(@"完成").btnAddToView(self.bottomToolView);
     }];
     //选中数量
     self.numberButton = [UIButton makeButton:^(UIButton *make) {
@@ -160,6 +160,12 @@ static NSString *photoPreviewIdentifier = @"photoPreviewCell";
     }
     //更新底部操作按钮状态
     [self reloadBottomInfo];
+}
+
+#pragma mark - 完成按钮
+- (void)finishChoose{
+    [self.bottomToolView removeFromSuperview];
+    [[self getManager] finishTheSelection];
 }
 
 #pragma mark - 更新底部视图

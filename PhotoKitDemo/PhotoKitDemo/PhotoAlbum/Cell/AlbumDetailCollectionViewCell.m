@@ -9,7 +9,7 @@
 #import "AlbumDetailCollectionViewCell.h"
 #import "Masonry.h"
 
-@interface AlbumDetailCollectionViewCell()
+@interface AlbumDetailCollectionViewCell()<ASMultiplexImageNodeDelegate,ASMultiplexImageNodeDataSource>
 {
     UIImage *selectedImage;
     UIImage *unSelectedImage;
@@ -18,30 +18,15 @@
 
 @implementation AlbumDetailCollectionViewCell
 
-- (void)prepareForReuse{
-    [super prepareForReuse];
-    self.photoImageView.displaySuspended = true;
-}
-
 - (instancetype)initWithFrame:(CGRect)frame{
     if (self = [super initWithFrame:frame]) {
         //照片
-//        self.photoImageView = [UIImageView makeImageView:^(UIImageView *make) {
-//            make.ivLayerMasksToBounds(true).ivContentMode(UIViewContentModeScaleAspectFill).ivAddToView(self.contentView);
-//        }];
         self.photoImageView = [[ASImageNode alloc] init];
         self.photoImageView.frame = CGRectMake(0, 0, ITEMSIZE, ITEMSIZE);
         self.photoImageView.contentMode = UIViewContentModeScaleAspectFill;
         self.photoImageView.backgroundColor = [UIColor whiteColor];
-        self.photoImageView.layer.masksToBounds = true;
-        
         [self.contentView addSubnode:self.photoImageView];
-        
-//        [self.photoImageView mas_makeConstraints:^(MASConstraintMaker *make) {
-//            make.top.equalTo(self.contentView);
-//            make.left.equalTo(self.contentView);
-//            make.size.equalTo(self.contentView);
-//        }];
+
         //是否选中的小圆点
         self.circle = [UIButton makeButton:^(UIButton *make) {
             make.btnAddTarget(self,@selector(clickSelectButton),UIControlEventTouchUpInside).btnImage([UIImage imageNamed:@"photo_def_photoPickerVc@2x"]).btnAddToView(self.contentView);
@@ -55,6 +40,7 @@
         
         selectedImage = [UIImage imageNamed:@"photo_sel_photoPickerVc@2x"];
         unSelectedImage = [UIImage imageNamed:@"photo_def_photoPickerVc@2x"];
+ 
     }
     return self;
 }
@@ -67,10 +53,12 @@
 #pragma mark - 设置模型
 - (void)setModel:(AssetModel *)model{
     _model = model;
-
-    //获取资源id
-    self.representedAssetIdentifier = [[PhotoKitTool shareInstance] getAssetIdentifier:model.asset];
-    //从系统相册中获取照片
+    
+//    [self.photoImageView reloadImageIdentifierSources];
+//    self.representedAssetIdentifier = [[PhotoKitTool shareInstance] getAssetIdentifier:self.model.asset];
+    
+    //从系统相册中获取照片 当前版本用的是ASMultiplexImageNode
+    // fetchImageFromSystem 方法可以与ASImageNode同用，不能与ASMultiplexImageNode同用
     [self fetchImageFromSystem:model];
     
     //判断是否选中
@@ -80,18 +68,17 @@
 
 #pragma mark - 从系统相册中获取照片
 - (void)fetchImageFromSystem:(AssetModel *)model{
+    
+    HXWeakSelf(self)
     //发送获取图片的请求，并获取请求id
-    PHImageRequestID imageRequestID = [[PhotoKitTool shareInstance] getImageWithAsset:model.asset imageSize:CGSizeMake(ITEMSIZE, ITEMSIZE) completion:^(UIImage *image, NSDictionary *dic, BOOL isDegraded) {
-//        if (isDegraded) {
-//            return;
-//        }
+    PHImageRequestID imageRequestID = [[PhotoKitTool shareInstance] getImageWithAsset:model.asset imageSize:CGSizeMake(ITEMSIZE, ITEMSIZE) completion:^(UIImage *image, NSDictionary *dic, BOOL isDegraded) {HXStrongSelf(weakSelf)
+        strongSelf.representedAssetIdentifier = [[PhotoKitTool shareInstance] getAssetIdentifier:strongSelf.model.asset];
         //如果当前请求id==当前资源id，则图片设置为当前请求的图片
-        if ([self.representedAssetIdentifier isEqualToString:[[PhotoKitTool shareInstance] getAssetIdentifier:model.asset]]) {
-            self.photoImageView.displaySuspended = false;
-            self.photoImageView.image = image;
+        if ([strongSelf.representedAssetIdentifier isEqualToString:[[PhotoKitTool shareInstance] getAssetIdentifier:model.asset]]) {
+            strongSelf.photoImageView.image = image;
         } else {
             //否则取消当前请求id
-            [[PHImageManager defaultManager] cancelImageRequest:self.imageRequestID];
+            [[PHImageManager defaultManager] cancelImageRequest:strongSelf.imageRequestID];
         }
     }];
 

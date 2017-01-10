@@ -20,9 +20,7 @@
     
     //获取相册中全部照片筛选参数
     PHFetchOptions *fetchAllOptions;
-    
-    // 获取Caches目录路径
-    NSString *cachesDir;
+
 }
 
 @end
@@ -65,13 +63,6 @@ static PhotoKitTool *tool;
     fetchAllOptions = [[PHFetchOptions alloc] init];
     fetchAllOptions.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:true]];
     
-    // 获取Caches目录路径
-    cachesDir = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
-    cachesDir = [cachesDir stringByAppendingPathComponent:[NSString stringWithFormat:@"imageCaching"]];
-    if (![[NSFileManager defaultManager] fileExistsAtPath:cachesDir]) {
-        //如果文件夹不存在，则创建文件夹
-        [[NSFileManager defaultManager] createDirectoryAtPath:cachesDir withIntermediateDirectories:true attributes:nil error:nil];
-    }
 }
 
 - (NSMutableArray *)selectedAssets{
