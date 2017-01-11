@@ -63,10 +63,10 @@
             }
             // 对Cell上面的图片 做截图 来实现过渡动画视图
             UIImageView *screenShot = [[UIImageView alloc] initWithImage:image];
+            screenShot.image = image;
             screenShot.backgroundColor = [UIColor clearColor];
             screenShot.contentMode = UIViewContentModeScaleAspectFill;
             screenShot.layer.masksToBounds = true;
-#pragma mark - 修改
             screenShot.frame = [containerView convertRect:cell.photoImageView.view.frame fromView:cell.photoImageView.view.superview];
             
             cell.photoImageView.hidden = true;
@@ -93,6 +93,7 @@
                 cell.photoImageView.hidden = false;
                 // 动画截图移除View
                 [screenShot removeFromSuperview];
+
                 // 一定不要忘记告诉系统动画结束
                 // 执行
                 [transitionContext completeTransition:!transitionContext.transitionWasCancelled];
@@ -118,11 +119,11 @@
         __block AlbumDetailCollectionViewCell *toCell = (AlbumDetailCollectionViewCell *)[toVC.photoCollectionView cellForItemAtIndexPath:[NSIndexPath indexPathForRow:currentIndex-1 inSection:0]];
         //等cell滚动完成之后，在执行导航动画
         [toVC.photoCollectionView performBatchUpdates:^{
-#pragma mark - 修改
             CGRect toFrame = [containerView convertRect:toCell.photoImageView.view.frame fromView:toCell.photoImageView.view.superview];
             CGRect originFrame = toVC.photoCollectionView.frame;
             //默认是64，包含导航栏的高度
             CGRect realFrame = originFrame;
+            realFrame.size.width = SCREEN_WIDTH;
             realFrame.origin.y = 64;realFrame.size.height = SCREEN_HEIGHT-64-44;
             if (toCell == nil || !CGRectIntersectsRect(toFrame, originFrame)) {//如果是不在屏幕范围内的cell，则滚动到屏幕中间
                 [toVC.photoCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:(currentIndex - 1) inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredVertically animated:false];
@@ -156,7 +157,6 @@
                 fromVC.view.alpha = 0;
                 fromVC.bottomToolView.alpha = 0;
                 //获取目标cell的位置
-#pragma mark - 修改
                 screenShot.frame = [containerView convertRect:toCell.photoImageView.view.frame fromView:toCell.photoImageView.view.superview];
             } completion:^(BOOL finished) {
                 [fromVC.bottomToolView removeFromSuperview];

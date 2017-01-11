@@ -54,11 +54,6 @@
 - (void)setModel:(AssetModel *)model{
     _model = model;
     
-//    [self.photoImageView reloadImageIdentifierSources];
-//    self.representedAssetIdentifier = [[PhotoKitTool shareInstance] getAssetIdentifier:self.model.asset];
-    
-    //从系统相册中获取照片 当前版本用的是ASMultiplexImageNode
-    // fetchImageFromSystem 方法可以与ASImageNode同用，不能与ASMultiplexImageNode同用
     [self fetchImageFromSystem:model];
     
     //判断是否选中
@@ -69,10 +64,11 @@
 #pragma mark - 从系统相册中获取照片
 - (void)fetchImageFromSystem:(AssetModel *)model{
     
+    self.representedAssetIdentifier = [[PhotoKitTool shareInstance] getAssetIdentifier:self.model.asset];
+    
     HXWeakSelf(self)
     //发送获取图片的请求，并获取请求id
     PHImageRequestID imageRequestID = [[PhotoKitTool shareInstance] getImageWithAsset:model.asset imageSize:CGSizeMake(ITEMSIZE, ITEMSIZE) completion:^(UIImage *image, NSDictionary *dic, BOOL isDegraded) {HXStrongSelf(weakSelf)
-        strongSelf.representedAssetIdentifier = [[PhotoKitTool shareInstance] getAssetIdentifier:strongSelf.model.asset];
         //如果当前请求id==当前资源id，则图片设置为当前请求的图片
         if ([strongSelf.representedAssetIdentifier isEqualToString:[[PhotoKitTool shareInstance] getAssetIdentifier:model.asset]]) {
             strongSelf.photoImageView.image = image;
