@@ -11,14 +11,14 @@
 #import "PhotoPreviewController.h"
 #import "MagicMoveTransiton.h"
 #import "AlbumDetailCollectionViewCell.h"
+#import "TakePhotoCollectionViewCell.h"
+#import <objc/runtime.h>
 
 
-@interface AlbumDetailController ()<UICollectionViewDelegate,UICollectionViewDataSource,UINavigationControllerDelegate>
+@interface AlbumDetailController ()<UICollectionViewDelegate,UICollectionViewDataSource,UINavigationControllerDelegate,UIImagePickerControllerDelegate>
 {
     //每个item的大小
     CGFloat itemUnit;
-    //是否已经调用滑动到底部的方法
-    BOOL isScrollToBottom;
     //预加载的rect
     CGRect previousPreheatRect;
 }
@@ -34,12 +34,22 @@
 @property (nonatomic, strong) UIButton *previewButton;
 //是否需要转场动画
 @property (nonatomic, assign) BOOL isNeedMagic;
+//相册名称
+@property (nonatomic, copy) NSString *albumName;
+///相机
+@property (nonatomic, strong) UIImagePickerController *imagePickerVC;
+///scrollView滚动到底部的动画属性
+@property (nonatomic, assign) BOOL scrollToBottomAnimation;
+///是否已经调用滑动到底部的方法
+@property (nonatomic, assign) BOOL isScrollToBottom;
+
 
 @end
 
 @implementation AlbumDetailController
 
 static NSString *albumDetailIdentifier = @"albumDetailIdentifier";
+static NSString *takePhotoIdentifier = @"takePhotoIdentifier";
 
 - (instancetype)initWithAlbum:(PHAssetCollection *)album{
     if (self = [super init]) {
@@ -47,13 +57,37 @@ static NSString *albumDetailIdentifier = @"albumDetailIdentifier";
         //计算item的大小 每行4个 间隔3
         itemUnit = (SCREEN_WIDTH-3*5) / 4.0;
         //是否滑动到底部
-        isScrollToBottom = false;
+        self.isScrollToBottom = false;
         //初始化
         self.albumModel = [[PhotoKitTool shareInstance] getAlbumModeFromAlbum:self.album];
+        self.albumName = [[PhotoKitTool shareInstance] getAlbumName:self.album];
+        //scrollView滚动到底部的动画属性
+        self.scrollToBottomAnimation = false;
         //预加载空间
         previousPreheatRect = CGRectZero;
     }
     return self;
+}
+
+- (UIImagePickerController *)imagePickerVC{
+    if (!_imagePickerVC) {
+        _imagePickerVC = [[UIImagePickerController alloc] init];
+        _imagePickerVC.delegate = self;
+        
+        // 获取imageWithName方法地址
+        Method imageWithName = class_getClassMethod([UIImagePickerController class], @selector(dismissViewControllerAnimated:completion:));
+        
+        // 获取imageWithName方法地址
+        Method imageName = class_getClassMethod([self class], @selector(dismissViewimagePickerControllerAnimated:completion:));
+        
+        // 交换方法地址，相当于交换实现方式
+        method_exchangeImplementations(imageWithName, imageName);
+    }
+    return _imagePickerVC;
+}
+
+- (void)dismissViewimagePickerControllerAnimated:(BOOL)flag completion: (void (^)(void))completion{
+    NSLog(@"调用autoDismiss方法");
 }
 
 #pragma mark - 检查传入的默认选中数组是否存在
@@ -202,24 +236,38 @@ static NSString *albumDetailIdentifier = @"albumDetailIdentifier";
     }];
     //注册cell
     [self.photoCollectionView registerClass:[AlbumDetailCollectionViewCell class] forCellWithReuseIdentifier:albumDetailIdentifier];
+    [self.photoCollectionView registerClass:[TakePhotoCollectionViewCell class] forCellWithReuseIdentifier:takePhotoIdentifier];
 
 }
 
 #pragma mark - 视图布局完成之后，将视图滑动到底部
 - (void)viewDidLayoutSubviews{
-    if (!isScrollToBottom && self.albumModel.assetsArray.count > 0) {
-        [self.photoCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:self.albumModel.assetsArray.count-1 inSection:0] atScrollPosition:UICollectionViewScrollPositionBottom animated:false];
-        isScrollToBottom = true;
+    if (!self.isScrollToBottom && self.albumModel.assetsArray.count > 0) {
+        if ([self.albumName isEqualToString:@"相机胶卷"]) {//如果是'相机胶卷'的拍照位置
+            [self.photoCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:self.albumModel.assetsArray.count inSection:0] atScrollPosition:UICollectionViewScrollPositionBottom animated:self.scrollToBottomAnimation];
+        }else{
+            [self.photoCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:self.albumModel.assetsArray.count-1 inSection:0] atScrollPosition:UICollectionViewScrollPositionBottom animated:false];
+        }
+        self.isScrollToBottom = true;
     }
     
 }
 
 #pragma mark - UICollectionView代理方法
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
+    if ([self.albumName isEqualToString:@"相机胶卷"]) {
+        return self.albumModel.count + 1;
+    }
     return self.albumModel.count;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
+    if ([self.albumName isEqualToString:@"相机胶卷"] && indexPath.row == self.albumModel.count) {//如果是'相机胶卷'的拍照位置
+        TakePhotoCollectionViewCell *takePhoto = [collectionView dequeueReusableCellWithReuseIdentifier:takePhotoIdentifier forIndexPath:indexPath];
+        [takePhoto setImageName:@"takePhoto"];
+        return takePhoto;
+    }
+    
     AlbumDetailCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:albumDetailIdentifier forIndexPath:indexPath];
     //判断是否选中
     AssetModel *model = self.albumModel.assetsArray[indexPath.row];
@@ -232,7 +280,7 @@ static NSString *albumDetailIdentifier = @"albumDetailIdentifier";
     }
     //设置模型
     cell.model = model;
-    cell.tag = indexPath.row;
+    
     HXWeakSelf(self)
     //选中时的回调
     cell.selectClosure = ^(AssetModel *assetModel, BOOL isSelected, AlbumDetailCollectionViewCell *blockCell){
@@ -255,17 +303,76 @@ static NSString *albumDetailIdentifier = @"albumDetailIdentifier";
         }
         [strongSelf reloadBottomInfo];
     };
+ 
     return cell;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
-    PhotoPreviewController *preview = [[PhotoPreviewController alloc] initWithAssets:self.albumModel.assetsArray atIndex:(int)indexPath.item + 1 magic:true];
-    //需要转场动画
-    self.isNeedMagic = true;
-    [self.navigationController pushViewController:preview animated:true];
+    if ([self.albumName isEqualToString:@"相机胶卷"] && indexPath.row == self.albumModel.assetsArray.count) {
+        [self takePhoto];
+    }else{
+        PhotoPreviewController *preview = [[PhotoPreviewController alloc] initWithAssets:self.albumModel.assetsArray atIndex:(int)indexPath.item + 1 magic:true];
+        //需要转场动画
+        self.isNeedMagic = true;
+        [self.navigationController pushViewController:preview animated:true];
+    }
 }
 
-#pragma mark - 判断方向
+#pragma mark - 拍照
+- (void)takePhoto {
+    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    if ((authStatus == AVAuthorizationStatusRestricted || authStatus ==AVAuthorizationStatusDenied)) {
+        [self showAlertWithTitle:@"无法使用相机" message:@"请在iPhone的""设置-隐私-相机""中允许访问相机"];
+    } else { // 调用相机
+        UIImagePickerControllerSourceType sourceType = UIImagePickerControllerSourceTypeCamera;
+        if ([UIImagePickerController isSourceTypeAvailable: UIImagePickerControllerSourceTypeCamera]) {
+            self.imagePickerVC.sourceType = sourceType;
+            _imagePickerVC.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+            [self presentViewController:_imagePickerVC animated:YES completion:nil];
+        } else {
+            NSLog(@"模拟器中无法打开照相机,请在真机中使用");
+        }
+    }
+}
+
+#pragma mark - UIImagePickerControllerDelegate
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    [picker dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)imagePickerController:(UIImagePickerController*)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    [picker dismissViewControllerAnimated:YES completion:nil];
+    NSString *type = [info objectForKey:UIImagePickerControllerMediaType];
+    if ([type isEqualToString:@"public.image"]) {
+        UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
+        UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), NULL);
+    }
+}
+
+///图片保存结果回调
+- (void)image: (UIImage *) image didFinishSavingWithError: (NSError *) error contextInfo: (void *) contextInfo
+{
+    if(error != NULL){
+        [self showAlertWithTitle:@"图片保存失败" message:[NSString stringWithFormat:@"原因：%@",error.localizedDescription]];
+    }else{//图片保存失败刷新
+        //重新获取数据源
+        AlbumModel *newAlbumModel = [[PhotoKitTool shareInstance] getAlbumModeFromAlbum:self.album];
+        if (newAlbumModel.count - self.albumModel.count == 1) {
+            self.albumModel = newAlbumModel;
+            //回调刷新
+            if (self.loadBlock) {
+                self.loadBlock();
+            }
+            [self.photoCollectionView performBatchUpdates:^{
+                [self.photoCollectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.albumModel.count-1 inSection:0]]];
+                self.scrollToBottomAnimation = true;
+                self.isScrollToBottom = false;
+            } completion:nil];
+        }
+    }
+}
+
+#pragma mark - scrollViewDidScroll
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView{
 //    [self updateCachedAssets];
 }
@@ -395,11 +502,6 @@ static NSString *albumDetailIdentifier = @"albumDetailIdentifier";
         [assets addObject:asset];
     }
     return assets;
-}
-
-
-- (void)dealloc {
-    NSLog(@"...");
 }
 
 @end

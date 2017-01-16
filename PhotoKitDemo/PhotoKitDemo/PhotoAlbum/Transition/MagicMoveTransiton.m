@@ -67,7 +67,8 @@
             screenShot.backgroundColor = [UIColor clearColor];
             screenShot.contentMode = UIViewContentModeScaleAspectFill;
             screenShot.layer.masksToBounds = true;
-            screenShot.frame = [containerView convertRect:cell.photoImageView.view.frame fromView:cell.photoImageView.view.superview];
+//            screenShot.frame = [containerView convertRect:cell.photoImageView.view.frame fromView:cell.photoImageView.view.superview];
+            screenShot.frame = [containerView convertRect:cell.photoImageView.frame fromView:cell.photoImageView.superview];
             
             cell.photoImageView.hidden = true;
             
@@ -119,7 +120,8 @@
         __block AlbumDetailCollectionViewCell *toCell = (AlbumDetailCollectionViewCell *)[toVC.photoCollectionView cellForItemAtIndexPath:[NSIndexPath indexPathForRow:currentIndex-1 inSection:0]];
         //等cell滚动完成之后，在执行导航动画
         [toVC.photoCollectionView performBatchUpdates:^{
-            CGRect toFrame = [containerView convertRect:toCell.photoImageView.view.frame fromView:toCell.photoImageView.view.superview];
+//            CGRect toFrame = [containerView convertRect:toCell.photoImageView.view.frame fromView:toCell.photoImageView.view.superview];
+            CGRect toFrame = [containerView convertRect:toCell.photoImageView.frame fromView:toCell.photoImageView.superview];
             CGRect originFrame = toVC.photoCollectionView.frame;
             //默认是64，包含导航栏的高度
             CGRect realFrame = originFrame;
@@ -157,7 +159,8 @@
                 fromVC.view.alpha = 0;
                 fromVC.bottomToolView.alpha = 0;
                 //获取目标cell的位置
-                screenShot.frame = [containerView convertRect:toCell.photoImageView.view.frame fromView:toCell.photoImageView.view.superview];
+//                screenShot.frame = [containerView convertRect:toCell.photoImageView.view.frame fromView:toCell.photoImageView.view.superview];
+                screenShot.frame = [containerView convertRect:toCell.photoImageView.frame fromView:toCell.photoImageView.superview];
             } completion:^(BOOL finished) {
                 [fromVC.bottomToolView removeFromSuperview];
                 [screenShot removeFromSuperview];

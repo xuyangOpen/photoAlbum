@@ -73,7 +73,7 @@ static NSString *albumIdentifier = @"albumCell";
     //把"相机胶卷"排在第一个
     for (int i=0;i<self.albumsArray.count;i++) {
         PHAssetCollection *album = self.albumsArray[i];
-        if ([album.localizedTitle isEqualToString:@"Camera Roll"]) {
+        if ([album.localizedTitle isEqualToString:@"Camera Roll"] || [album.localizedTitle isEqualToString:@"相机胶卷"]) {
             [self.albumsArray exchangeObjectAtIndex:0 withObjectAtIndex:i];
             break;
         }
@@ -122,6 +122,11 @@ static NSString *albumIdentifier = @"albumCell";
     //已选资源数组清空
     PhotoKitTool *tool = [PhotoKitTool shareInstance];
     tool.selectedAssets = nil;
+    
+    //如果有拍照的照片添加，则重新加载刷新照片数量
+    detailVC.loadBlock = ^(){
+        [self.albumTableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+    };
     
     [self.navigationController pushViewController:detailVC animated:animated];
 }

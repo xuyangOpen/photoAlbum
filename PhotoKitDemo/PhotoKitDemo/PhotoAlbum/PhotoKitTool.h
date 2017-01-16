@@ -65,6 +65,9 @@
 ///用Asset获取照片资源
 - (PHImageRequestID)getImageWithAsset:(id)asset imageSize:(CGSize)needImageSize completion:(void (^)(UIImage *, NSDictionary *, BOOL isDegraded))completion;
 
+///用Asset获取照片资源
+- (PHImageRequestID)getImageWithAsset:(id)asset imageSize:(CGSize)needImageSize assetId:(NSString *)assetId completion:(void (^)(UIImage *, NSDictionary *, BOOL isDegraded))completion;
+
 ///获取照片内存大小
 - (void)getPhotosBytesWithAsset:(AssetModel *)model complete:(void(^)(NSString *))complete;
 

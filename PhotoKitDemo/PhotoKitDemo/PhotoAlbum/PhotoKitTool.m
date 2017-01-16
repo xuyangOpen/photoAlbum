@@ -27,9 +27,8 @@
 
 @implementation PhotoKitTool
 
-static PhotoKitTool *tool;
-
 + (instancetype)shareInstance{
+    static PhotoKitTool *tool;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         tool = [[PhotoKitTool alloc] init];
@@ -56,7 +55,7 @@ static PhotoKitTool *tool;
      */
     
     //异步时，可能会返回多个结果
-    requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
+//    requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
     requestOptions.resizeMode = PHImageRequestOptionsResizeModeFast;
     
     //从相册获取全部照片筛选参数
@@ -162,8 +161,10 @@ static PhotoKitTool *tool;
         if (imageSize.width == 0 && imageSize.height == 0) {
             imageSize = PHImageManagerMaximumSize;
         }
+        
         //图片参数
         PHImageRequestID imageRequestID = [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:imageSize contentMode:PHImageContentModeAspectFill options:requestOptions resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+//            NSLog(@"----");
             BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
             if (downloadFinined && result) {
 //                result = [self fixOrientation:result];
@@ -183,6 +184,48 @@ static PhotoKitTool *tool;
                     }
                 }];
             }
+
+        }];
+        return imageRequestID;
+    }
+    return 0;
+}
+
+#pragma mark - 通过Asset获取图片
+- (PHImageRequestID)getImageWithAsset:(id)asset imageSize:(CGSize)needImageSize assetId:(NSString *)assetId completion:(void (^)(UIImage *, NSDictionary *, BOOL))completion{
+    if ([asset isKindOfClass:[PHAsset class]]) {
+        //计算图片需要的pixel
+        CGSize imageSize = [self transformPointsToPixel:needImageSize];
+        if (imageSize.width == 0 && imageSize.height == 0) {
+            imageSize = PHImageManagerMaximumSize;
+        }
+        //图片参数
+        PHImageRequestID imageRequestID = [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:imageSize contentMode:PHImageContentModeAspectFill options:requestOptions resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+
+            BOOL downloadFinined = (![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey]);
+            if (downloadFinined && result && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue]) {
+                //                result = [self fixOrientation:result];
+                if ([assetId isEqualToString:[self getAssetIdentifier:asset]]) {
+                    if (completion) completion(result,info,false);
+                }else{
+                    [[PHImageManager defaultManager] cancelImageRequest:imageRequestID];
+                }
+            }
+            // Download image from iCloud / 从iCloud下载图片
+            if ([info objectForKey:PHImageResultIsInCloudKey] && !result) {
+                PHImageRequestOptions *option = [[PHImageRequestOptions alloc]init];
+                option.networkAccessAllowed = YES;
+                option.resizeMode = PHImageRequestOptionsResizeModeFast;
+                [[PHImageManager defaultManager] requestImageDataForAsset:asset options:option resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+                    UIImage *resultImage = [UIImage imageWithData:imageData scale:0.1];
+                    //                    resultImage = [self scaleImage:resultImage toSize:imageSize];
+                    if (resultImage) {
+                        //                        resultImage = [self fixOrientation:resultImage];
+                        if (completion) completion(resultImage,info,[[info objectForKey:PHImageResultIsDegradedKey] boolValue]);
+                    }
+                }];
+            }
+ 
         }];
         return imageRequestID;
     }

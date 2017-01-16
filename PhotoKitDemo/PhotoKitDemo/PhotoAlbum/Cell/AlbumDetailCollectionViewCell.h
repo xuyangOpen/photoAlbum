@@ -10,14 +10,13 @@
 #import "ExtensionHeader.h"
 #import <Photos/Photos.h>
 #import "PhotoKitTool.h"
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
 
 @class AlbumDetailCollectionViewCell;
 typedef void(^SelectionBlock)(AssetModel *, BOOL , AlbumDetailCollectionViewCell *);
 
 @interface AlbumDetailCollectionViewCell : UICollectionViewCell
 
-@property (nonatomic, strong) ASImageNode *photoImageView;
+@property (nonatomic, strong) UIImageView *photoImageView;
 @property (nonatomic, strong) AssetModel *model;
 @property (nonatomic, copy) NSString *representedAssetIdentifier;
 @property (nonatomic, assign) PHImageRequestID imageRequestID;

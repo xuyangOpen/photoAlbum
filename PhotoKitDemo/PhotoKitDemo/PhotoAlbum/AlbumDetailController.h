@@ -9,9 +9,13 @@
 #import "BaseViewController.h"
 #import <Photos/Photos.h>
 
+typedef void(^loadCountClosure)();
+
 @interface AlbumDetailController : BaseViewController
 
 @property (nonatomic, strong) UICollectionView *photoCollectionView;
+
+@property (nonatomic, copy) loadCountClosure loadBlock;
 
 - (instancetype)initWithAlbum:(PHAssetCollection *)album;
 

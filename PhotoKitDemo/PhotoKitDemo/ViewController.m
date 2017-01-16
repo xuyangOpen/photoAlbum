@@ -31,7 +31,7 @@
 }
 
 - (void)finishTheSelection:(NSArray<PHAsset *> *)assets imageArray:(NSArray<UIImage *> *)imageArray isOriginal:(BOOL)isOriginal{
-    self.assets = assets;
+//    self.assets = assets;
     NSLog(@"选择了%lu张图片  ，原图： %d",(unsigned long)imageArray.count,isOriginal);
 }
 
